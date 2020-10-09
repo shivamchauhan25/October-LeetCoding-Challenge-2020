@@ -1,0 +1,89 @@
+ Serialize and Deserialize BST
+ 
+ Serialization is converting a data structure or object into a sequence of bits so that it can be stored in a file or memory buffer, or transmitted across a network connection link to be reconstructed later in the same or another computer environment.
+
+Design an algorithm to serialize and deserialize a binary search tree. There is no restriction on how your serialization/deserialization algorithm should work. You need to ensure that a binary search tree can be serialized to a string, and this string can be deserialized to the original tree structure.
+
+The encoded string should be as compact as possible.
+
+ 
+
+Example 1:
+
+Input: root = [2,1,3]
+Output: [2,1,3]
+Example 2:
+
+Input: root = []
+Output: []
+ 
+
+Constraints:
+
+The number of nodes in the tree is in the range [0, 104].
+0 <= Node.val <= 104
+The input tree is guaranteed to be a binary search tree.
+
+Solution:
+C++:
+
+class Codec {
+public:
+
+    // Encodes a tree to a single string.
+    string serialize(TreeNode* root) {
+        queue <TreeNode*> bfs;
+        bfs.push(root); 
+        if(root == NULL) return "NULL" ;
+        string out =  "" + to_string(root->val); 
+        while(!bfs.empty()){
+            TreeNode* temp = bfs.front();
+            bfs.pop(); 
+            if(temp == NULL) out += ",NULL";
+            else{ 
+                if(temp != root) out += "," + to_string(temp->val);
+                if(temp->left ) bfs.push(temp->left);
+                else bfs.push(NULL); 
+                if(temp->right ) bfs.push(temp->right);
+                else bfs.push(NULL); 
+            }
+        }
+        
+        return out ;
+    }
+
+    // Decodes your encoded data to tree.
+    TreeNode* deserialize(string data) {
+        vector <string> tree;
+        stringstream check1(data); 
+        string intermediate; 
+        while(getline(check1, intermediate, ',')) { 
+            tree.push_back(intermediate); 
+        } 
+
+        int n = tree.size(); 
+        if(tree[0] == "NULL") return NULL; 
+        TreeNode* root = new TreeNode(stoi(tree[0])); 
+        queue<TreeNode*> bfs; 
+        bfs.push(root); 
+        int i= 0; 
+        while(!bfs.empty() && i<n/2){
+            TreeNode* temp = bfs.front();
+            bfs.pop(); 
+            if(tree[2*i+1] != "NULL"){
+                TreeNode* l = new TreeNode(stoi(tree[2*i+1])); 
+                temp->left = l;
+                bfs.push(l); 
+            }
+            if(tree[2*i+2] != "NULL"){
+                TreeNode* r = new TreeNode(stoi(tree[2*i+2])); 
+                temp->right = r;
+                bfs.push(r); 
+            }
+            
+            i++; 
+        }
+    
+        return root; 
+    }
+};
